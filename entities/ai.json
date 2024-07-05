@@ -1,0 +1,70 @@
+[
+	{
+		"_loc": {
+			"tenant": "default",
+			"teams": ["default"]
+		},
+		"id": "provider-openai",
+		"name": "OpenAI",
+		"description": "",
+		"metadata": {},
+		"tags": [],
+		"provider": "openai",
+		"connection": {
+			"base_url": "https://api.openai.com",
+			"token": "${environment.OPENAI_TOKEN}",
+			"timeout": 30000
+		},
+		"options": {
+			"model": "gpt-3.5-turbo",
+			"frequency_penalty": null,
+			"logit_bias": null,
+			"logprobs": null,
+			"top_logprobs": null,
+			"max_tokens": null,
+			"n": 1,
+			"presence_penalty": null,
+			"response_format": null,
+			"seed": null,
+			"stop": null,
+			"stream": false,
+			"temperature": 1,
+			"top_p": 1,
+			"tools": null,
+			"tool_choice": null,
+			"user": null
+		},
+		"kind": "AiProvider"
+	},
+	{
+		"_loc": {
+			"tenant": "default",
+			"teams": ["default"]
+		},
+		"id": "context-cloudapim",
+		"name": "Cloud APIM",
+		"description": "",
+		"metadata": {},
+		"tags": [],
+		"messages": [
+			{
+				"role": "system",
+				"content": "Cloud APIM is a french company that provides API Management as a Service through managed Otoroshi instances, Serverless projects, etc"
+			}
+		],
+		"kind": "AiPromptContext"
+	},
+	{
+		"_loc": {
+			"tenant": "default",
+			"teams": ["default"]
+		},
+		"id": "prompt-template-translator",
+		"name": "translator",
+		"description": "",
+		"metadata": {},
+		"tags": [],
+		"template": "[\n  {\n    \"role\":\"user\",\n    \"content\":\"You are a translator, please translate the following text to @{body.lang}: @{body.text}\" \n  }\n]",
+		"kind": "AiPromptTemplate"
+	}
+]

@@ -1,0 +1,58 @@
+{
+	"docs": [
+		{
+			"type": "doc",
+			"id": "index",
+			"label": "Index"
+		},
+		{
+			"type": "doc",
+			"id": "demo-1-prompt-context",
+			"label": "Demo 1 - Prompt Context"
+		},
+		{
+			"type": "doc",
+			"id": "demo-2-prompt-templating",
+			"label": "Demo 2 - Prompt templating"
+		},
+		{
+			"type": "doc",
+			"id": "demo-3-mock",
+			"label": "Demo 3 - Data mockups"
+		},
+		{
+			"type": "doc",
+			"id": "demo-4-ui-mock",
+			"label": "Demo 4 - UI mockups"
+		},
+		{
+			"type": "doc",
+			"id": "demo-5-access-validation",
+			"label": "Demo 5 - Access validation"
+		},
+		{
+			"type": "doc",
+			"id": "demo-6-data-enrichment",
+			"label": "Demo 6 - Data enrichment"
+		},
+		{
+			"type": "doc",
+			"id": "demo-7-data-cleanup",
+			"label": "Demo 7 - Data cleanup"
+		},
+		{
+			"type": "doc",
+			"id": "demo-8-websocket-messages-validation",
+			"label": "Demo 8 - Websocket validation"
+		},
+    {
+			"type": "doc",
+			"id": "demo-9-gdpr",
+			"label": "Demo 9 - Data anonymisation"
+		},
+		{
+			"type": "api-ref",
+			"label": "API Reference"
+		}
+	]
+}

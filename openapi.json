@@ -1,0 +1,992 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Otoroshi LLM Extension demo",
+    "version": "1.0.0",
+    "description": "How to use the Otoroshi LLM Extension in your Cloud APIM Serverless projects",
+    "contact": {
+      "name": "Cloud APIM Default contact address",
+      "url": "https://www.cloud-apim.com",
+      "email": "contact@cloud-apim.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "egress-proxy-pattern",
+      "description": "All the use cases for people that uses a LLM in their application already. In that case Otoroshi is used to proxy the LLM API and apply various controls"
+    },
+    {
+      "name": "end-users",
+      "description": "All the use cases for people that do not use a LLM in their application already. In that case we use the LLM to configure the gateway using natural language"
+    }
+  ],
+  "paths": {
+    "/context": {
+      "post": {
+        "tags": [
+          "egress-proxy-pattern"
+        ],
+        "summary": "",
+        "description": "This endpoint demonstrates how to add context to a prompt sent to an LLM API provider. In this particular case it provides a definition of what is Cloud APIM.",
+        "operationId": "add-context-to-prompt",
+        "responses": {
+          "200": {
+            "description": "LLM Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "LLM Request prompt",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMRequest"
+              }
+            }
+          }
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/mirror"
+        },
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/context"
+        }
+      }
+    },
+    "/template": {
+      "post": {
+        "tags": [
+          "egress-proxy-pattern"
+        ],
+        "summary": "",
+        "description": "This demo show how to use a template to create a prompt based on common specifications. Here we make a translator service with a generic prompt that uses expression language to extract informations from the current request (in that case from the request body).",
+        "operationId": "prompt-templating",
+        "responses": {
+          "200": {
+            "description": "LLM Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "The translator request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "examples": [
+                  {
+                    "lang": "fr",
+                    "text": "Hello World !"
+                  }
+                ],
+                "properties": {
+                  "lang": {
+                    "description": "the language to translate to",
+                    "type": "string"
+                  },
+                  "text": {
+                    "description": "the text to translate",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/mirror"
+        },
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/template"
+        }
+      }
+    },
+    "/mock": {
+      "get": {
+        "summary": "",
+        "deprecated": false,
+        "description": "In this example, we use a LLM to generate mock data for an endpoint. This usage could be useful in case you need to start to create an app before an api is available. The LLM will be able to generate structured data based on your specifications written in natural language.",
+        "operationId": "generate-mock-data",
+        "tags": [
+          "end-users"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "email": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "age": {
+                        "type": "number"
+                      },
+                      "address": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/mock"
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/mirror"
+        }
+      }
+    },
+    "/uimock": {
+      "get": {
+        "summary": "",
+        "deprecated": false,
+        "description": "In this example, we use a LLM to generate ui mockup for a web application. The LLM is be able to generate html based on your specifications written in natural language. In that case, it's a website that looks like google.com",
+        "operationId": "display-moogle-website",
+        "tags": [
+          "end-users"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {}
+            }
+          },
+          "default": {
+            "description": "Generic error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/uimock"
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/mirror"
+        }
+      }
+    },
+    "/access": {
+      "get": {
+        "summary": "",
+        "deprecated": false,
+        "description": "Here we use the LLM to validate user access. The LLM has the full request representation sent to it and is able to evaluate access rules based on your prompt. Here we use a header but you can express complexe rules with very specific conditions.",
+        "operationId": "access-validation",
+        "tags": [
+          "end-users"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MirrorResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/access"
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/mirror"
+        }
+      }
+    },
+    "/enrich": {
+      "post": {
+        "summary": "",
+        "deprecated": false,
+        "description": "Here with use the LLM to add missing data in an http request before the request hits your API. In this case, it add the country in the request payload based on the city mentionned in the payload.",
+        "operationId": "data-enrichment",
+        "tags": [
+          "end-users"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MirrorResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "a request body to enrich",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "examples": [
+                  {
+                    "email": "contact@cloud-apim.com",
+                    "city": "Poitiers"
+                  }
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/enrich"
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/bodymirror"
+        }
+      }
+    },
+    "/cleanup": {
+      "post": {
+        "tags": [
+          "end-users"
+        ],
+        "summary": "",
+        "description": "Here we use the LLM to hide sensitive informations to avoid data leaks. In this particular case, the LLM hides a credit card number and add contextual informations about the card.",
+        "operationId": "data-cleanup",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MirrorResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "a request body to cleanup",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "examples": [
+                  {
+                    "credit_card": "4035501000000008"
+                  }
+                ],
+                "properties": {
+                  "credit_card": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/bodymirror"
+        },
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/cleanup"
+        }
+      }
+    },
+    "/websocket": {
+      "get": {
+        "summary": "",
+        "deprecated": false,
+        "description": "In this demo, we use a LLM to validate message sent over websocket in a chat room or something similar to avoid crude language or hate speech",
+        "operationId": "validate-websocket-messages",
+        "tags": [
+          "end-users"
+        ],
+        "responses": {
+          "101": {
+            "description": "switching to websocket protocol"
+          }
+        },
+        "parameters": [],
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/websocket"
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/websocket"
+        }
+      }
+    },
+    "/gdpr": {
+      "post": {
+        "tags": [
+          "end-users"
+        ],
+        "summary": "",
+        "description": "Here we use a LLM to anonymize sensitive data from the response. In that case, it replaces personnal data with coherent informations.",
+        "operationId": "personal-informations-anonymization",
+        "responses": {
+          "200": {
+            "description": "anonymized response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MirrorResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Generic error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "a request body to anonymize",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "examples": [
+                  {
+                    "name": "Mathieu ANCELIN",
+                    "age": 38,
+                    "role": "speaker",
+                    "languages": [
+                      "scala",
+                      "java",
+                      "javascript",
+                      "rust"
+                    ],
+                    "email": "mathieu.ancelin@cloud-apim.com"
+                  }
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "age": {
+                    "type": "number"
+                  },
+                  "languages": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-cloud-apim-backend": {
+          "$ref": "#/components/x-cloud-apim-backends/bodymirror"
+        },
+        "x-cloud-apim-plugins": {
+          "$ref": "#/components/x-cloud-apim-plugins/gdpr"
+        }
+      }
+    }
+  },
+  "components": {
+    "x-cloud-apim-plugins": {
+      "context": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {},
+          "bound_listeners": [],
+          "plugin_index": {
+            "transform_request": 0
+          }
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiLlmProxy",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai"
+          },
+          "bound_listeners": [],
+          "plugin_index": {}
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiPromptContext",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "context-cloudapim"
+          },
+          "bound_listeners": [],
+          "plugin_index": {
+            "transform_request": 1
+          }
+        }
+      ],
+      "cleanup": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {},
+          "bound_listeners": [],
+          "plugin_index": {
+            "transform_request": 0
+          }
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiResponseBodyModifier",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai",
+            "prompt": "Response with the same json but with any credit card number masked out and add the type of credit card between parenthesis (Visa, Mastercard, etc)",
+            "is_response": false,
+            "prompt_ref": null,
+            "context_ref": null,
+            "extractor": null
+          },
+          "bound_listeners": [],
+          "plugin_index": {
+            "transform_response": 0
+          }
+        }
+      ],
+      "gdpr": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {}
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiResponseBodyModifier",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai",
+            "prompt": "Replace any personal informations from the incoming JSON message with fake informations. Only return transformed JSON, nothing else",
+            "is_response": false,
+            "prompt_ref": null,
+            "context_ref": null,
+            "extractor": null
+          }
+        }
+      ],
+      "websocket": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {}
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiWebsocketMessageValidator",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai",
+            "prompt": "If you encounter hate speech or crude language in the incoming message return \"false\", if not return \"true\". do not add additional text",
+            "is_response": false,
+            "prompt_ref": null,
+            "context_ref": null,
+            "extractor": null
+          }
+        }
+      ],
+      "enrich": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {}
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiRequestBodyModifier",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai",
+            "prompt": "in my JSON message, anywhere there is a JSON object with a \"city\" field without a \"country\" field, please add the \"country\" field in which the city resides. Only return the JSON message, no extra text",
+            "is_response": false,
+            "prompt_ref": null,
+            "context_ref": null,
+            "extractor": null
+          }
+        }
+      ],
+      "access": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {}
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiContextValidator",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai",
+            "prompt": "if the current request has a header named \"admin\" and this header has a value set to \"true\", respond with \"true\". If not, respond with \"false\". Do not add anything else",
+            "is_response": false,
+            "prompt_ref": null,
+            "context_ref": null,
+            "extractor": null
+          }
+        }
+      ],
+      "mock": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {}
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiResponseGenerator",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai",
+            "prompt": "generate an array of 5 json objects. Those objects represents users with an email field, a name field, an age and an address. Only return json, no additional text",
+            "is_response": false,
+            "prompt_ref": null,
+            "context_ref": null,
+            "extractor": null
+          }
+        }
+      ],
+      "uimock": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {}
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiResponseGenerator",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai",
+            "prompt": "generate the html for a website that just looks like google.com but that is called moogle with the same style and colors. just return the html code, nothing else",
+            "is_response": false,
+            "prompt_ref": null,
+            "context_ref": null,
+            "extractor": null
+          }
+        }
+      ],
+      "template": [
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi.next.plugins.OverrideHost",
+          "include": [],
+          "exclude": [],
+          "config": {},
+          "bound_listeners": [],
+          "plugin_index": {
+            "transform_request": 0
+          }
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiLlmProxy",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "provider-openai"
+          },
+          "bound_listeners": [],
+          "plugin_index": {}
+        },
+        {
+          "enabled": true,
+          "debug": false,
+          "plugin": "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiPromptTemplate",
+          "include": [],
+          "exclude": [],
+          "config": {
+            "ref": "prompt-template-translator"
+          },
+          "bound_listeners": [],
+          "plugin_index": {
+            "transform_request": 1
+          }
+        }
+      ],
+      "defaultPlugins": []
+    },
+    "x-cloud-apim-backends": {
+      "mirror": {
+        "targets": [
+          {
+            "hostname": "mirror.otoroshi.io",
+            "port": 443,
+            "tls": true
+          }
+        ],
+        "root": "/",
+        "rewrite": false
+      },
+      "bodymirror": {
+        "targets": [
+          {
+            "hostname": "bodymirror.otoroshi.io",
+            "port": 443,
+            "tls": true
+          }
+        ],
+        "root": "/",
+        "rewrite": false
+      },
+      "websocket": {
+        "targets": [
+          {
+            "hostname": "echo.websocket.org",
+            "port": 443,
+            "tls": true
+          }
+        ],
+        "root": "/",
+        "rewrite": false
+      },
+      "defaultBackend": {
+        "root": "/",
+        "rewrite": false,
+        "targets": [
+          {
+            "hostname": "jsonplaceholder.typicode.com",
+            "port": 443,
+            "tls": true
+          }
+        ]
+      }
+    },
+    "schemas": {
+      "MirrorResponse": {
+        "description": "a response from mirror.otoroshi.io",
+        "type": "object",
+        "examples": [
+          {
+            "method": "get",
+            "path": "/",
+            "headers": {
+              "Content-Type": "application/json",
+              "body": "{\"message\":\"hello world\"}"
+            }
+          }
+        ],
+        "properties": {
+          "method": {
+            "type": "object",
+            "description": "the http method sent to mirror.otoroshi.io"
+          },
+          "path": {
+            "type": "string",
+            "description": "the http path sent to mirror.otoroshi.io"
+          },
+          "headers": {
+            "type": "object",
+            "description": "the http headers sent to mirror.otoroshi.io"
+          },
+          "body": {
+            "type": "string",
+            "description": "the http body sent to mirror.otoroshi.io"
+          }
+        }
+      },
+      "LLMRequest": {
+        "description": "A query provided to a LLM API. The same format for any provider used.",
+        "type": "object",
+        "properties": {
+          "messages": {
+            "type": "array",
+            "examples": [
+              [
+                {
+                  "role": "user",
+                  "content": "Hello there"
+                }
+              ]
+            ],
+            "items": {
+              "description": "",
+              "type": "object",
+              "examples": [
+                {
+                  "role": "user",
+                  "content": "Hello there"
+                }
+              ],
+              "properties": {
+                "role": {
+                  "description": "",
+                  "type": "string",
+                  "examples": [
+                    "system",
+                    "user"
+                  ]
+                },
+                "content": {
+                  "description": "",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "LLMResponse": {
+        "description": "A response provided by a LLM API. The same format for any provider used.",
+        "type": "object",
+        "properties": {
+          "generations": {
+            "type": "array",
+            "examples": [
+              [
+                {
+                  "message": {
+                    "role": "assistant",
+                    "content": "Hello I'm an assistant"
+                  }
+                }
+              ]
+            ],
+            "items": {
+              "description": "",
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "",
+                  "type": "object",
+                  "examples": [
+                    {
+                      "role": "assistant",
+                      "content": "Hello I'm an assistant"
+                    }
+                  ],
+                  "properties": {
+                    "role": {
+                      "description": "",
+                      "type": "string",
+                      "examples": [
+                        "system",
+                        "user"
+                      ]
+                    },
+                    "content": {
+                      "description": "",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "metadata": {
+            "description": "",
+            "type": "object",
+            "properties": {
+              "usage": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                  "prompt_tokens": {
+                    "description": "",
+                    "type": "number"
+                  },
+                  "generation_tokens": {
+                    "description": "",
+                    "type": "number"
+                  }
+                }
+              },
+              "rate_limit": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                  "requests_limit": {
+                    "description": "",
+                    "type": "number"
+                  },
+                  "requests_remaining": {
+                    "description": "",
+                    "type": "number"
+                  },
+                  "tokens_limit": {
+                    "description": "",
+                    "type": "number"
+                  },
+                  "tokens_remaining": {
+                    "description": "",
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "description": "Object representing an error",
+        "type": "object",
+        "properties": {
+          "code": {
+            "format": "int32",
+            "description": "Error code that identify of the error",
+            "type": "integer",
+            "examples": [
+              "1000"
+            ]
+          },
+          "message": {
+            "description": "Short description of the error",
+            "type": "string",
+            "examples": [
+              "Could not perform the task"
+            ]
+          }
+        }
+      }
+    },
+    "x-cloud-apim-frontends": {}
+  }
+}

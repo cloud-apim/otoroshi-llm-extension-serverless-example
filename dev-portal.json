@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "auth": true,
+  "title": "Otoroshi LLM Extension demo",
+  "examples": true,
+  "path": "/docs",
+  "icon": "https://www.cloud-apim.com/assets/logo/made-with-cloud-apim-inverted.png",
+  "max_user_created_apikeys": 0,
+  "plans": []
+}

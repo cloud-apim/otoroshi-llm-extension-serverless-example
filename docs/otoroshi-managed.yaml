@@ -1,0 +1,986 @@
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Provider"
+metadata:
+  name: "openai"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+  name: "OpenAI"
+  description: ""
+  metadata:
+    updated_at: "2024-06-27T19:41:45.675Z"
+  tags: []
+  provider: "openai"
+  connection:
+    base_url: "https://api.openai.com"
+    token: "${vault://local/openai-token}"
+    timeout: 30000
+  options:
+    model: "gpt-3.5-turbo"
+    frequency_penalty: null
+    logit_bias: null
+    logprobs: null
+    top_logprobs: null
+    max_tokens: null
+    "n": 1
+    presence_penalty: null
+    response_format: null
+    seed: null
+    stop: null
+    stream: false
+    temperature: 1
+    top_p: 1
+    tools: null
+    tool_choice: null
+    user: null
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "PromptTemplate"
+metadata:
+  name: "translator"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "prompt-template_b5246746-4c56-40a6-b9cb-61cfb71ab224"
+  name: "translator"
+  description: ""
+  metadata:
+    created_at: "2024-06-27T12:01:48.048Z"
+    updated_at: "2024-06-27T21:24:39.212Z"
+  tags: []
+  template: "[\n  {\n    \"role\":\"user\",\n    \"content\":\"You are a translator,\
+    \ please translate the following text to @{body.lang}: @{body.text}\" \n  }\n]"
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "PromptContext"
+metadata:
+  name: "cloud-apim"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "prompt-context_ee65b7c0-97c6-4ec3-8fd6-b9978a60a8a6"
+  name: "Cloud APIM"
+  description: ""
+  metadata:
+    created_at: "2024-06-27T15:05:31.955Z"
+    updated_at: "2024-06-27T21:24:27.564Z"
+  tags: []
+  messages:
+  - role: "system"
+    content: "Cloud APIM is a french company that provides managed otoroshi instances"
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_37a024dd6-5876-4b14-84ee-bc958ec03992"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_37a024dd6-5876-4b14-84ee-bc958ec03992"
+  name: "context"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/demo"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "mirror.otoroshi.io"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiLlmProxy"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+    bound_listeners: []
+    plugin_index: {}
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiPromptContext"
+    include: []
+    exclude: []
+    config:
+      ref: "prompt-context_ee65b7c0-97c6-4ec3-8fd6-b9978a60a8a6"
+    bound_listeners: []
+    plugin_index:
+      transform_request: 1
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_6679abe61-13e9-4851-a5da-7000bb9419c8"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_6679abe61-13e9-4851-a5da-7000bb9419c8"
+  name: "template"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/backup/template"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "mirror.otoroshi.io"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiLlmProxy"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+    bound_listeners: []
+    plugin_index: {}
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiPromptTemplate"
+    include: []
+    exclude: []
+    config:
+      ref: "prompt-template_b5246746-4c56-40a6-b9cb-61cfb71ab224"
+    bound_listeners: []
+    plugin_index:
+      transform_request: 1
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_be686870c-a798-4c90-b860-e9e79a16b29a"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_be686870c-a798-4c90-b860-e9e79a16b29a"
+  name: "mock"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/backup/mock"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "mirror.otoroshi.io"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiResponseGenerator"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+      prompt: "generate an array of 5 json objects. Those objects represents users\
+        \ with an email field, a name field, an age and an address. Only return json,\
+        \ no additional text"
+      prompt_ref: null
+      context_ref: null
+      is_response: false
+      status: 200
+      headers: {}
+    bound_listeners: []
+    plugin_index: {}
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_4d9118ba5-e2e8-4cb1-8725-62a913b328c7"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_4d9118ba5-e2e8-4cb1-8725-62a913b328c7"
+  name: "ui mock"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/backup/moogle"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "mirror.otoroshi.io"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiResponseGenerator"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+      prompt: "generate the html for a website that just looks like google.com but\
+        \ that is called moogle with the same style and colors. just return the html\
+        \ code, nothing else"
+      prompt_ref: null
+      context_ref: null
+      is_response: false
+      status: 200
+      headers: {}
+    bound_listeners: []
+    plugin_index: {}
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_2cd02edac-7673-498e-9331-e8a2a588d43d"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_2cd02edac-7673-498e-9331-e8a2a588d43d"
+  name: "access"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/backup/access"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "mirror.otoroshi.io"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiContextValidator"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+      prompt: "if the current request has a header named \"admin\" and this header\
+        \ has a value set to \"true\", respond with \"true\". If not, respond with\
+        \ \"false\". Do not add anything else"
+      prompt_ref: null
+      context_ref: null
+      extractor: null
+    bound_listeners: []
+    plugin_index:
+      validate_access: 0
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_da7877652-09c8-4e38-a454-695dede49353"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_da7877652-09c8-4e38-a454-695dede49353"
+  name: "request enrichment"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/backup/enrich"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "mirror.otoroshi.io"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiRequestBodyModifier"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+      prompt: "in my JSON message, anywhere there is a JSON object with a \"city\"\
+        \ field without a \"country\" field, please add the \"country\" field in which\
+        \ the city resides. Only return the JSON message, no extra text"
+      prompt_ref: null
+      context_ref: null
+      extractor: null
+    bound_listeners: []
+    plugin_index:
+      transform_request: 1
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_3a7ce0083-0d93-4944-bbbe-485e0ba1804e"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_3a7ce0083-0d93-4944-bbbe-485e0ba1804e"
+  name: "cleanup"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/backup/cleanup"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "mirror.otoroshi.io"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiResponseBodyModifier"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+      prompt: "Response with the same json but with any credit card number masked\
+        \ out and add the type of credit card between parenthesis (Visa, Mastercard,\
+        \ etc)"
+      is_response: false
+      prompt_ref: null
+      context_ref: null
+      extractor: null
+    bound_listeners: []
+    plugin_index:
+      transform_response: 0
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_b2ca38776-9b19-46be-8d2b-754da5eeb86a"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_b2ca38776-9b19-46be-8d2b-754da5eeb86a"
+  name: "websocket"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/backup/websocket"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "echo.websocket.org"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiWebsocketMessageValidator"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+      prompt: "If you encounter hate speech or crude language in the incoming message\
+        \ return \"false\", if not return \"true\". do not add additional text"
+      prompt_ref: null
+      context_ref: null
+      extractor: null
+    bound_listeners: []
+    plugin_index:
+      validate_access: 0
+---
+apiVersion: "proxy.otoroshi.io/v1"
+kind: "Route"
+metadata:
+  name: "route_d95a4180b-4347-482b-91d8-8152678410bb"
+spec:
+  _loc:
+    tenant: "default"
+    teams:
+    - "default"
+  id: "route_d95a4180b-4347-482b-91d8-8152678410bb"
+  name: "rgpd"
+  description: "A new route"
+  tags: []
+  metadata: {}
+  enabled: true
+  debug_flow: false
+  export_reporting: false
+  capture: false
+  groups:
+  - "default"
+  bound_listeners: []
+  frontend:
+    domains:
+    - "your-own-otoroshi-managed-domain.otoroshiapps.cloud/backup/rgpd"
+    strip_path: true
+    exact: false
+    headers: {}
+    query: {}
+    methods: []
+  backend:
+    targets:
+    - id: "target_1"
+      hostname: "mirror.otoroshi.io"
+      port: 443
+      tls: true
+      weight: 1
+      predicate:
+        type: "AlwaysMatch"
+      protocol: "HTTP/1.1"
+      ip_address: null
+      tls_config:
+        certs: []
+        trusted_certs: []
+        enabled: false
+        loose: false
+        trust_all: false
+    root: "/"
+    rewrite: false
+    load_balancing:
+      type: "RoundRobin"
+    client:
+      retries: 1
+      max_errors: 20
+      retry_initial_delay: 50
+      backoff_factor: 2
+      call_timeout: 30000
+      call_and_stream_timeout: 120000
+      connection_timeout: 10000
+      idle_timeout: 60000
+      global_timeout: 30000
+      sample_interval: 2000
+      proxy: {}
+      custom_timeouts: []
+      cache_connection_settings:
+        enabled: false
+        queue_size: 2048
+    health_check:
+      enabled: false
+      url: ""
+      timeout: 5000
+      healthyStatuses: []
+      unhealthyStatuses: []
+  backend_ref: null
+  plugins:
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi.next.plugins.OverrideHost"
+    include: []
+    exclude: []
+    config: {}
+    bound_listeners: []
+    plugin_index:
+      transform_request: 0
+  - enabled: true
+    debug: false
+    plugin: "cp:otoroshi_plugins.com.cloud.apim.otoroshi.extensions.aigateway.plugins.AiResponseBodyModifier"
+    include: []
+    exclude: []
+    config:
+      ref: "provider_c4247752-3fd9-4346-b4ce-f1f0a2c1166c"
+      prompt: "Replace any personal informations from the incoming JSON message with\
+        \ fake informations. Only return transformed JSON, nothing else"
+      is_response: false
+      prompt_ref: null
+      context_ref: null
+      extractor: null
+    bound_listeners: []
+    plugin_index:
+      transform_response: 0
